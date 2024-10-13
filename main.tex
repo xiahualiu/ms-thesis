@@ -1,0 +1,121 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% University of Cincinnati Thesis Template v1.1
+% Author: Xiahua Liu
+% Date: 10/13/2024
+% License: CC0 (no copyright reserved)
+%
+% LaTeX is the de facto standard for the communication and publication of scientific documents and is available as free software.
+% In LaTeX, you mark up the text with different tags. Opposed to "What you see is what you get" , LaTeX will arrange the text and things like links, cross references, citations for you during compilation, it makes you focus on the content itself rather than the format.
+%
+% This template is well scripted and is pretty straight forward in almost every thing.
+% It is designed to use only necessary packages, and giving the user flexibility to add more features if needed.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt, twoside]{report}
+
+%% Encoding Settings
+\usepackage[T1]{fontenc}
+
+%% Figure Settings 
+\usepackage{graphicx}
+\graphicspath{{images/}} % Default picture folder
+
+%% Math packages
+\usepackage{amsmath}
+\usepackage{gensymb} % More symbols like \degree
+
+%% Misc packages
+\usepackage{appendix} %self explanatory
+\usepackage{caption} %allows captions for graphics
+\usepackage[nottoc]{tocbibind} %adds the bibliography to the table of contents
+\usepackage{subcaption} %allows subcaption for multiple images in one graphic
+
+%% Code Highlighting
+\usepackage{minted}
+
+%% Hyperlinks
+\usepackage[hyphens]{url} % Break long URL in Bib by hyphens
+\usepackage{hyperref}
+\hypersetup{colorlinks=false} % No blue link texts!
+
+%% Page Margin Settings
+\usepackage[letterpaper, top=1in, bottom = 1in, right = 1in]{geometry}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Preamble
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\input{preamble/titlepage.tex}
+
+\pagenumbering{roman}
+%Roman numbering is recommended until the body
+
+% The preamble section is double spacing.
+\renewcommand{\baselinestretch}{2}\selectfont
+
+% Abstract page
+\input{preamble/abstract.tex}
+
+% Blank page
+\clearpage
+
+% Acknowledge page
+\input{preamble/acknowledgements.tex}
+
+% The Table of Content is single spacing.
+\renewcommand{\baselinestretch}{1}\selectfont
+
+% Set table of content depth to 4 to ensure all subsubsections and paragraphs are collected
+\setcounter{tocdepth}{4}
+
+\tableofcontents
+
+\listoffigures
+
+\listoftables
+
+\newpage
+
+\pagenumbering{arabic}
+%back to Arabic numbering for the rest
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Chapters
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% The main text is double line spacing.
+\renewcommand{\baselinestretch}{2}\selectfont
+
+\input{chapters/01intro}
+
+\input{chapters/02mech}
+
+\input{chapters/03electrical}
+
+\input{chapters/04sim}
+
+\input{chapters/05control}
+
+\input{preamble/conclusion.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Appendices
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\appendix
+
+\input{appendices/t200-data.tex}
+
+\input{appendices/ekf-sym}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Bibliography
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}

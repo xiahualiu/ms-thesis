@@ -1,0 +1,17 @@
+\chapter{Conclusion}
+
+This report describes the water surface robot, Piranha. The first chapter covers the initial concept of Piranha and compares multiple available trash collection options before Piranha's configuration is finally determined. The second chapter tells the reader how we built the Piranha from simple mechanical parts. The third chapter illustrates the electrical system that powers the Piranha and the specifications of all components and their verification. The fourth chapter proposes a new way to formulate a dynamic model for a water surface vehicle and provides the numerical methods needed on the computer.  The fifth chapter first introduces a 13-state EKF based on the modern control theory and then a PD controller for heading and speed control. At the end of the fifth chapter, this report describes a feedback linearization controller to achieve the trajectory tracking function on Piranha.
+
+The simulation brought in chapter four is based on several existing designs. Because it reads the model as a triangle mesh, it does not care about the configurations of the watercraft. Additionally, the simulation results have a very high precision because it uses a more precise frontal area estimate algorithm based on the sliced triangle faces. 
+
+We keep a balance between complexity and speed for the EKF discussed in chapter five. It shows good stability even under considerable GPS noise. There is a possibility of increasing the state vector length and acquiring better precision. However, the EKF will also lose its speed simultaneously.
+
+This report also serves as an entry-level engineering practice guidance for anyone who wants to build an RC vehicle, either a car, drone, or boat, in the real world. It includes concept development, mechanical design, electrical design, simulation, and the control system design, all essential sections for a successful robot design.
+
+\section{Future work}
+
+Although it is still at prototyping stage, Piranha will be a commercial product and eventually be on the market. So the most critical work for the mechanical and electrical design in the next step is to simplify the manufacturing process and speed up the production meanwhile reducing the fabrication cost for each unit. This work includes customizing plastic molds and drawing PCBs.
+
+On the safety aspect, electromagnetic interference (EMI) and several fail-safe routines need to be designed in the next step to ensure the electrical system's stability and the operators' safety. Also, as a marine robot, it needs to meet the same industry standards for a common watercraft, such as the signal lights and other proper indicators.
+
+There is still a lot of space for improvement in the control section, like using reinforcement learning and model predictive controllers for better tracking results. They are not discussed in this report because they are still under development at this moment. In the next step, more control approaches will be developed, and their performance will be investigated.

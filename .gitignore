@@ -1,0 +1,12 @@
+_minted
+*.aux
+*.bbl
+*.blg
+*.log
+*.fls
+*.lof
+*.lot
+*.out
+*.gz
+*.toc
+*.fdb_latexmk

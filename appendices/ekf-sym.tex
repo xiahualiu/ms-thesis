@@ -1,0 +1,167 @@
+\label{app:ekf-sympy}
+\chapter{Piranha EKF SymPy Script}
+
+In the application, the essential EKF functions such as the Kalman gain functions, are generated first using a computer algebra system (CAS) called \mintinline{python}{SymPy} and the results are saved. This \mintinline{python}{SymPy} script will take about 5~10 minutes on a modern PC to finish. EKF function blocks are saved into separated binary files using the Python \mintinline{python}{dill} tool.
+
+\renewcommand{\baselinestretch}{1}\selectfont
+\begin{minted}{python}
+## Piranha EKF Symbolic Computation Script
+# Author: Xiahua Liu
+# Last Modified Date: 10/13/2021
+# Description: This script generates the EKF functions in numpy
+# format and saves them in binary files with the dill library
+# The EKF invented in this script has 13 states.
+# This script takes around 5~10 minutes on a modern computer.
+
+from sympy import *
+from sympy.algebras.quaternion import Quaternion
+
+# Dill the result functions to disks
+import dill
+dill.settings['recurse'] = True
+
+## Define state variables
+# IMU delta angle measurements in body axes - rad
+dax, day, daz = symbols("da_x, da_y, da_z", real=True)
+# IMU delta velocity measurements in body axes - m/sec
+dvx, dvy, dvz = symbols("dv_x, dv_y, dv_z", real=True)
+# Quaternions
+q0, q1, q2, q3 = symbols("q_0, q_1, q_2, q_3", real=True)
+# NED velocity - m/sec
+vn, ve, vd = symbols("v_n, v_e, v_d", real=True)   
+# NED position - m
+pn, pe, pd = symbols("p_n, p_e, p_d", real=True)  
+# IMU time step 
+dt = symbols("dt", real=True)    
+# NED gravity vector - m/sec^2
+g = symbols("g", real=True)    
+# NED earth fixed magnetic field components - milligauss
+magN, magE, magD = symbols("mag_N, mag_E, mag_D", real=True)    
+
+P = MatrixSymbol('P', 13, 13) # P matrix
+Q = MatrixSymbol('Q', 13, 13) # Q matrix
+R_mag = MatrixSymbol('R_mag', 1,1) # R mag 
+R_gps = MatrixSymbol('R_gps', 1,1) # R gps postion 
+
+# Define the state vector
+stateVector = Matrix([q0, q1, q2, q3, vn, ve, vd, pn, pe, pd, magN, magE, magD])
+
+# Meaured angle speed and acceleration
+da = Matrix([dax, day, daz])
+dv = Matrix([dvx, dvy, dvz])
+
+# Quaternion vector & rotation matrix
+quat = Quaternion(q0, q1, q2, q3)
+Tbn = quat.to_rotation_matrix()
+
+# NED Gravity calculation
+gvec=Matrix([0,0,g], real=True)
+
+
+## Predict Step
+# Quaternion update equation
+delQuat = Quaternion(1, 0.5*dax*dt, 0.5*day*dt, 0.5*daz*dt)
+quatNew = quat.mul(delQuat)
+
+# Velocity update equation
+vNew = Matrix([vn, ve, vd])+gvec*dt+Tbn*dv*dt
+
+# Position update equation
+pNew = Matrix([pn, pe, pd])+Matrix([vn, ve, vd])*dt
+
+# Earth magnetic field update equation
+magNew = Matrix([magN, magE, magD])
+
+# Process equation
+processEqn = Matrix([quatNew.a, quatNew.b, quatNew.c, quatNew.d, vNew, pNew, magNew])
+
+
+## Innovation Step
+# Linearized state transition matrix
+F=simplify(processEqn.jacobian(stateVector))
+
+# Pack into lambda objects
+F_lambda=lambdify((q0,q1,q2,q3,dvx,dvy,dvz,dax,day,daz,dt), F, 'numpy')
+# Dill the lambda functions
+dill.dump(F_lambda, open("F_lambda.npf", "wb"))
+
+# New covariance matrix
+PP=simplify(F*P*F.T+Q)
+
+# Pack into lambda objects
+PP_lambda=lambdify((q0,q1,q2,q3,dvx,dvy,dvz,dax,day,daz,dt, P, Q, g), PP, 'numpy')
+# Dill the lambda functions
+dill.dump(PP_lambda, open("PP_lambda.npf", "wb"))
+
+
+## Mag measurement fusion
+magMeas=Tbn.T*Matrix([magN, magE, magD])
+
+# Mag measurement jacobian
+H_mag=simplify(magMeas.jacobian(stateVector))
+
+# Mag observation funciton
+H_magx=H_mag[0,:]
+H_magy=H_mag[1,:]
+H_magz=H_mag[2,:]
+
+# Kalman gains for mag fustion
+K_mx=simplify((P*H_magx.T)/(H_magx*P*H_magx.T+R_mag))
+K_my=simplify((P*H_magy.T)/(H_magy*P*H_magy.T+R_mag))
+K_mz=simplify((P*H_magz.T)/(H_magz*P*H_magz.T+R_mag))
+
+# GPS measurement jacobian
+H_gps=simplify(Matrix([pn, pe, pd]).jacobian(stateVector))
+
+# GPS observation function
+H_gpsn=H_gps[0,:]
+H_gpse=H_gps[1,:]
+H_gpsd=H_gps[2,:]
+
+# Kalman gains for GPS fustion
+K_pn=simplify((P*H_gpsn.T)/(H_gpsn*P*H_gpsn.T+R_gps))
+K_pe=simplify((P*H_gpse.T)/(H_gpse*P*H_gpse.T+R_gps))
+K_pd=simplify((P*H_gpsd.T)/(H_gpsd*P*H_gpsd.T+R_gps))
+
+
+## Pack result function into lambda objects
+# Pack into lambda objects
+H_magx_lambda=lambdify((q0,q1,q2,q3, magN, magE, magD), H_magx, 'numpy')
+H_magy_lambda=lambdify((q0,q1,q2,q3, magN, magE, magD), H_magy, 'numpy')
+H_magz_lambda=lambdify((q0,q1,q2,q3, magN, magE, magD), H_magz, 'numpy')
+
+# Dill the lambda functions
+dill.dump(H_magx_lambda, open("H_magx_lambda.npf", "wb"))
+dill.dump(H_magy_lambda, open("H_magy_lambda.npf", "wb"))
+dill.dump(H_magz_lambda, open("H_magz_lambda.npf", "wb"))
+
+# Pack into lambda objects
+H_gpsn_lambda=lambdify((), H_gpsn, 'numpy')
+H_gpse_lambda=lambdify((), H_gpse, 'numpy')
+H_gpsd_lambda=lambdify((), H_gpsd, 'numpy')
+
+# Dill the lambda functions
+dill.dump(H_gpsn_lambda, open("H_gpsn_lambda.npf", "wb"))
+dill.dump(H_gpse_lambda, open("H_gpse_lambda.npf", "wb"))
+dill.dump(H_gpsd_lambda, open("H_gpsd_lambda.npf", "wb"))
+
+# Pack into lambda objects
+K_mx_lambda=lambdify((q0,q1,q2,q3,magN,magE,magD, P, R_mag), K_mx, 'numpy')
+K_my_lambda=lambdify((q0,q1,q2,q3,magN,magE,magD, P, R_mag), K_my, 'numpy')
+K_mz_lambda=lambdify((q0,q1,q2,q3,magN,magE,magD, P, R_mag), K_mz, 'numpy')
+
+# Dill the lambda functions
+dill.dump(K_mx_lambda, open("K_mx_lambda.npf", "wb"))
+dill.dump(K_my_lambda, open("K_my_lambda.npf", "wb"))
+dill.dump(K_mz_lambda, open("K_mz_lambda.npf", "wb"))
+
+# Pack into lambda objects
+K_pn_lambda=lambdify((P,R_gps), K_pn, 'numpy')
+K_pe_lambda=lambdify((P,R_gps), K_pe, 'numpy')
+K_pd_lambda=lambdify((P,R_gps), K_pd, 'numpy')
+
+# Dill the lambda functions
+dill.dump(K_pn_lambda, open("K_pn_lambda.npf", "wb"))
+dill.dump(K_pe_lambda, open("K_pe_lambda.npf", "wb"))
+dill.dump(K_pd_lambda, open("K_pd_lambda.npf", "wb"))
+\end{minted}
