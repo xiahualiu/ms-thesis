@@ -16,7 +16,7 @@ jobs:
         uses: xu-cheng/latex-action@v3
         with:
           root_file: main.tex
-          pre_compile: tlmgr update --all && tlmgr install minted
+          pre_compile: tlmgr update --self --all && tlmgr install minted
       - name: Upload PDF file
         uses: actions/upload-artifact@v4
         with:
