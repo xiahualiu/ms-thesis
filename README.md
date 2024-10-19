@@ -13,3 +13,7 @@ My graduate M.S thesis at UC CEAS school archive.
 ```bash
 latexmk -interaction=nonstopmode -pdf main.tex
 ```
+
+## Download PDF
+
+You can find the latest compiled PDFs from GitHub Action workflows.
