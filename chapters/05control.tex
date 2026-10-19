@@ -257,7 +257,7 @@ The $[{\rm mag}_N, {\rm mag}_E, {\rm mag}_D]$ prediction equation is very simple
 Where $g_n,g_e,g_d$ are the gravity components in NED frame, $\mathcal{F}$ is the quaternion multiplication function.
 
 
-After getting the discretized EOM, EKF calculates the Jacobian of the EOM $\boldsymbol{F}_j$ using the built-in python function \mintinline{python}{jacobian()}. Then it is used to update the covariance matrix:
+After getting the discretized EOM, EKF calculates the Jacobian of the EOM $\boldsymbol{F}_j$ using the built-in python function \lstinline|jacobian()|. Then it is used to update the covariance matrix:
 
 \begin{equation}
     \boldsymbol{P}[t+1]=\boldsymbol{F}_j \boldsymbol{P}[t+1] {\boldsymbol{F}^\top}_j+\boldsymbol{Q}_k
@@ -668,4 +668,4 @@ The second test has a square-shaped trajectory. Compared with the circle traject
     \label{fig:05fl-result-square-u}
 \end{figure}
 
-We can see that the feedback linearization controller can navigate Piranha to drive towards the expected trajectory. However, because it only considers the error at present, it cannot eliminate the error at the $v$ direction, which requires the controller to have the ability to plan. 
+We can see that the feedback linearization controller can navigate Piranha to drive towards the expected trajectory. However, because it only considers the error at present, it cannot eliminate the error at the $v$ direction, which requires the controller to have the ability to plan.

@@ -1,10 +1,10 @@
 \label{app:ekf-sympy}
 \chapter{Piranha EKF SymPy Script}
 
-In the application, the essential EKF functions such as the Kalman gain functions, are generated first using a computer algebra system (CAS) called \mintinline{python}{SymPy} and the results are saved. This \mintinline{python}{SymPy} script will take about 5~10 minutes on a modern PC to finish. EKF function blocks are saved into separated binary files using the Python \mintinline{python}{dill} tool.
+In the application, the essential EKF functions such as the Kalman gain functions, are generated first using a computer algebra system (CAS) called \lstinline|SymPy| and the results are saved. This \lstinline|SymPy| script will take about 5~10 minutes on a modern PC to finish. EKF function blocks are saved into separated binary files using the Python \lstinline|dill| tool.
 
 \renewcommand{\baselinestretch}{1}\selectfont
-\begin{minted}{python}
+\begin{lstlisting}
 ## Piranha EKF Symbolic Computation Script
 # Author: Xiahua Liu
 # Last Modified Date: 10/13/2021
@@ -164,4 +164,4 @@ K_pd_lambda=lambdify((P,R_gps), K_pd, 'numpy')
 dill.dump(K_pn_lambda, open("K_pn_lambda.npf", "wb"))
 dill.dump(K_pe_lambda, open("K_pe_lambda.npf", "wb"))
 dill.dump(K_pd_lambda, open("K_pd_lambda.npf", "wb"))
-\end{minted}
+\end{lstlisting}

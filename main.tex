@@ -15,9 +15,11 @@
 
 %% Encoding Settings
 \usepackage[T1]{fontenc}
+\usepackage{textcomp}
 
 %% Figure Settings 
 \usepackage{graphicx}
+\usepackage{float}
 \graphicspath{{images/}} % Default picture folder
 
 %% Math packages
@@ -31,7 +33,20 @@
 \usepackage{subcaption} %allows subcaption for multiple images in one graphic
 
 %% Code Highlighting
-\usepackage{minted}
+\usepackage{xcolor}
+\usepackage{listings}
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily,
+    keywordstyle=\color{blue!60!black}\bfseries,
+    commentstyle=\color{green!40!black}\itshape,
+    stringstyle=\color{red!60!black},
+    columns=fullflexible,
+    keepspaces=true,
+    upquote=true,
+    showstringspaces=false,
+    breaklines=true
+}
 
 %% Hyperlinks
 \usepackage[hyphens]{url} % Break long URL in Bib by hyphens

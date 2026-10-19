@@ -1,11 +1,7 @@
 name: PDFLatex
 
 on:
-  push:
-    branches:
-      - main
-  schedule:
-    - cron: "0 0 1 * *"
+  workflow_dispatch:
 
 jobs:
   pdflatex:
@@ -15,9 +11,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: LaTeX action
-        uses: xu-cheng/latex-action@v3
+        uses: xu-cheng/latex-action@v4
         with:
           root_file: main.tex
+          texlive_version: latest
       - name: Upload PDF file
         uses: actions/upload-artifact@v4
         with:
